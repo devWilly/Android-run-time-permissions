@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">M-PermissionEx</string>
+    <string name="permission_success_message">權限已經開啟</string>
+    <string name="alert_dialog_title">開啟權限</string>
+    <string name="alert_dialog_message">若無開啟儲存權限，將影響部分功能。</string>
+    <string name="alert_dialog_positive_button_text">了解</string>
+
+    <string name="alert_dialog_reopen_permission_title">重新開啟權限？</string>
+    <string name="alert_dialog_reopen_permission_message">若要使用此功能，需開啟對應的權限功能</string>
+    <string name="alert_dialog_reopen_permission_positive_button_text">開啟</string>
+    <string name="alert_dialog_reopen_permission_button_text">開啟</string>
 </resources>
