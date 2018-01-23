@@ -90,6 +90,16 @@ public class MainActivity extends AppCompatActivity {
                     showToast(getString(R.string.permission_success_message));
                 }
                 break;
+            case REQUEST_CODE_MULTI_PERMISSION:
+                String yes = getString(R.string.yes);
+                String no = getString(R.string.no);
+
+                Toast.makeText(this, getString(R.string.returned_multi_permission_info,
+                        hasReceiveSMSPermission() ? yes : no, hasReadPhoneStatePermission() ? yes: no),
+                        Toast.LENGTH_SHORT)
+                        .show();
+
+                break;
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
                 break;
