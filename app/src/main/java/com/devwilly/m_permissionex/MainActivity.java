@@ -12,7 +12,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -22,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE_PERMISSION = 0;
     private static final int REQUEST_CODE_MULTI_PERMISSION = 1;
+    private static final int REQUEST_CODE_SETTING_PAGE = 999;
     private static final String[] MANIFEST_ONE_PERMISSION = new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private static final String[] MANIFEST_MULTI_PERMISSION = new String[] {Manifest.permission.READ_PHONE_STATE, Manifest.permission.RECEIVE_SMS};
 
@@ -79,6 +79,30 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Button checkPermissionOrOpenSettingPageBtn = findViewById(R.id.permission_setting_btn);
+        checkPermissionOrOpenSettingPageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (hasExternalStoragePermission()) {
+                    showToast(getString(R.string.permission_success_message));
+                } else {
+                    if (hasShowRequestPermissionRational()) {
+                        new AlertDialog.Builder(MainActivity.this)
+                                .setTitle(getString(R.string.alert_dialog_title))
+                                .setMessage(getString(R.string.alert_dialog_message))
+                                .setPositiveButton(getString(R.string.alert_dialog_positive_button_text), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        requestExternalStoragePermission();
+                                    }
+                                }).setCancelable(false).show();
+                    } else {
+                        requestExternalStoragePermission();
+                    }
+                }
+            }
+        });
+
     }
 
     @Override
@@ -88,6 +112,13 @@ public class MainActivity extends AppCompatActivity {
             case REQUEST_CODE_WRITE_EXTERNAL_STORAGE_PERMISSION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     showToast(getString(R.string.permission_success_message));
+                } else {
+                    if (!hasShowRequestPermissionRational()) {
+                        Intent intent = new Intent(
+                                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                Uri.fromParts("package", getPackageName(), null));
+                        startActivityForResult(intent, REQUEST_CODE_SETTING_PAGE);
+                    }
                 }
                 break;
             case REQUEST_CODE_MULTI_PERMISSION:
@@ -103,6 +134,21 @@ public class MainActivity extends AppCompatActivity {
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
                 break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_SETTING_PAGE) {
+            String yes = getString(R.string.yes);
+            String no = getString(R.string.no);
+
+            Toast.makeText(this, getString(R.string.returned_permission_info,
+                    hasExternalStoragePermission() ? yes : no),
+                    Toast.LENGTH_SHORT)
+                    .show();
         }
     }
 

@@ -18,4 +18,8 @@
         簡訊權限: %s
         \n電話權限: %s
     </string>
+
+    <string name="returned_permission_info">
+        儲存權限: %s
+    </string>
 </resources>
