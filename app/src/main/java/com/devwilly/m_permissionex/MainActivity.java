@@ -21,6 +21,9 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE_PERMISSION = 0;
+    private static final int REQUEST_CODE_MULTI_PERMISSION = 1;
+    private static final String[] MANIFEST_ONE_PERMISSION = new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    private static final String[] MANIFEST_MULTI_PERMISSION = new String[] {Manifest.permission.READ_PHONE_STATE, Manifest.permission.RECEIVE_SMS};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +55,30 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Button checkMultiPermissionBtn = findViewById(R.id.multi_permission_btn);
+        checkMultiPermissionBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (hasReadPhoneStatePermission() && hasReceiveSMSPermission()) {
+                    showToast(getString(R.string.permission_success_message));
+                } else {
+                    if (hasShowMultiRequestPermissionRational()) {
+                        new AlertDialog.Builder(MainActivity.this)
+                                .setTitle(getString(R.string.alert_dialog_title))
+                                .setMessage(getString(R.string.alert_dialog_message))
+                                .setPositiveButton(getString(R.string.alert_dialog_positive_button_text), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        requestMultiPermission();
+                                    }
+                                }).setCancelable(false).show();
+                    } else {
+                        requestMultiPermission();
+                    }
+                }
+            }
+        });
+
     }
 
     @Override
@@ -73,9 +100,24 @@ public class MainActivity extends AppCompatActivity {
         return ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
+    private boolean hasReadPhoneStatePermission() {
+        return ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private boolean hasReceiveSMSPermission() {
+        return ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED;
+    }
+
     private boolean hasShowRequestPermissionRational() {
         return ActivityCompat.shouldShowRequestPermissionRationale(
                 MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    }
+
+    private boolean hasShowMultiRequestPermissionRational() {
+        return ActivityCompat.shouldShowRequestPermissionRationale(
+                MainActivity.this, Manifest.permission.READ_PHONE_STATE) ||
+                ActivityCompat.shouldShowRequestPermissionRationale(
+                MainActivity.this, Manifest.permission.RECEIVE_SMS);
     }
 
     private void showToast(String toastMsg) {
@@ -85,7 +127,14 @@ public class MainActivity extends AppCompatActivity {
     private void requestExternalStoragePermission() {
         ActivityCompat.requestPermissions(
                 MainActivity.this,
-                new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                MANIFEST_ONE_PERMISSION,
                 REQUEST_CODE_WRITE_EXTERNAL_STORAGE_PERMISSION);
+    }
+
+    private void requestMultiPermission() {
+        ActivityCompat.requestPermissions(
+                MainActivity.this,
+                MANIFEST_MULTI_PERMISSION,
+                REQUEST_CODE_MULTI_PERMISSION);
     }
 }
